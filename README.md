@@ -1,4 +1,4 @@
-## invoker
+## invoker [![Go Report Card](https://goreportcard.com/badge/github.com/xlab/invoker)](https://goreportcard.com/report/github.com/xlab/invoker) [![GoDoc](https://godoc.org/github.com/xlab/invoker?status.svg)](https://godoc.org/github.com/xlab/invoker)
 
 A package providing supercharged primitive for `exec.Cmd` that redirects StdErr and StdOut for asynchronous and thread-safe reading.
 
