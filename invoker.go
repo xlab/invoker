@@ -29,9 +29,10 @@ func (res *InvokeResult) StdOut() []byte {
 
 type Invoker interface {
 	Run(ctx context.Context, args ...string) <-chan InvokeResult
-	RunWithOutputs(
+	RunWithIO(
 		ctx context.Context,
-		stdErr, stdOut io.ReadWriter,
+		stdIn io.Reader,
+		stdOut, stdErr io.Writer,
 		args ...string,
 	) <-chan InvokeResult
 	WorkingDir() string
@@ -68,8 +69,8 @@ func (inv *invoker) Run(ctx context.Context, args ...string) <-chan InvokeResult
 		stdErr := NewSafeBuffer()
 		stdOut := NewSafeBuffer()
 		result := InvokeResult{
-			stdErr: stdErr,
 			stdOut: stdOut,
+			stdErr: stdErr,
 		}
 
 		defer func() {
@@ -79,17 +80,18 @@ func (inv *invoker) Run(ctx context.Context, args ...string) <-chan InvokeResult
 
 		cmd := exec.CommandContext(ctx, inv.binPath, args...)
 		cmd.Dir = inv.workDir
-		cmd.Stderr = stdErr
 		cmd.Stdout = stdOut
+		cmd.Stderr = stdErr
 		result.Error = cmd.Run()
 	}()
 
 	return out
 }
 
-func (inv *invoker) RunWithOutputs(
+func (inv *invoker) RunWithIO(
 	ctx context.Context,
-	stdOut, stdErr io.ReadWriter,
+	stdIn io.Reader,
+	stdOut, stdErr io.Writer,
 	args ...string,
 ) <-chan InvokeResult {
 	out := make(chan InvokeResult, 1)
@@ -113,6 +115,10 @@ func (inv *invoker) RunWithOutputs(
 
 		cmd := exec.CommandContext(ctx, inv.binPath, args...)
 		cmd.Dir = inv.workDir
+
+		if stdIn != nil {
+			cmd.Stdin = stdIn
+		}
 
 		if stdOut != nil {
 			// write to both

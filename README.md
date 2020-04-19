@@ -38,7 +38,7 @@ logFn := func(data []byte) (stop bool) {
 
 stdErr := invoker.NewWatchedSafeBuffer(ctx, logFn, nil)
 
-out := invoker.RunWithOutputs(ctx, nil, stdErr, "list", "-fmt", "json")
+out := invoker.RunWithIO(ctx, nil, nil, stdErr, "list", "-fmt", "json")
 
 go invoker.DrainOut(out)
 ```
