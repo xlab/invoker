@@ -9,7 +9,8 @@ import (
 
 // DrainOut insures that no leaks from invoke result channel.
 func DrainOut(out <-chan InvokeResult) {
-	for range out {
+	for res := range out {
+		res.Discard()
 	}
 }
 

@@ -13,8 +13,8 @@ type InvokeResult struct {
 	Success bool
 	Error   error
 
-	stdErr io.Reader
-	stdOut io.Reader
+	stdErr *SafeBuffer
+	stdOut *SafeBuffer
 }
 
 func (res *InvokeResult) StdErr() []byte {
@@ -25,6 +25,16 @@ func (res *InvokeResult) StdErr() []byte {
 func (res *InvokeResult) StdOut() []byte {
 	data, _ := ioutil.ReadAll(res.stdOut)
 	return data
+}
+
+func (res *InvokeResult) Discard() {
+	if res.stdErr != nil {
+		res.stdErr.Discard()
+	}
+
+	if res.stdOut != nil {
+		res.stdOut.Discard()
+	}
 }
 
 type Invoker interface {
