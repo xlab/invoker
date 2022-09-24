@@ -10,8 +10,7 @@ import (
 )
 
 type InvokeResult struct {
-	Success bool
-	Error   error
+	Error error
 
 	stdErr *SafeBuffer
 	stdOut *SafeBuffer
